@@ -6,10 +6,8 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
-DOWNLOAD_DIR="${DIR_DOWNLOAD:-$(pwd)}"
-
 # Выполняем команду docker run с переданными аргументами
 docker run --rm \
-  -v "{DOWNLOAD_DIR}:/app" \
+  -v "/wv/back/download:/app" \
   -w /app \
   thr3a/yt-dlp "$@"
