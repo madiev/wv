@@ -45,7 +45,9 @@ function WatchComponent() {
           <Loading />
         )}
         {!show && (
-          <video className="h-[32rem]" autoPlay controls src={url} />
+          <video className="h-[32rem]" playsInline autoPlay controls src={url} >
+            Ваш браузер не поддерживает тег video
+          </video>
         )}
       </div>
   );
