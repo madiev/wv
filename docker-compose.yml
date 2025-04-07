@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  backend:
+    image: watchvideo/back
+    container_name: back
+    build:
+      context: ./back
+    environment:
+      - YT_KEY=xxxxx
+      - DIR_DOWNLOAD=./back/download
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./back/download:/go/download
+    ports:
+      - 9091:9999
+    restart: on-failure
+    networks:
+      - mytube-net
+  frontend:
+    image: watchvideo/front
+    container_name: front
+    build:
+      context: ./front
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+    restart: on-failure
+    networks:
+      - mytube-net
+  yt-dlp:
+    image: thr3a/yt-dlp:latest
+networks:
+  mytube-net:
+    driver: bridge
