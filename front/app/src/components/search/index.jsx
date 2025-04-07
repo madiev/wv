@@ -6,21 +6,25 @@ import { useRouter } from 'next/navigation';
 
 export const useStoreVideo = create((set) => ({
   data: {},
+  pending: true,
   setVideo: (res) => set(() => ({ data: res })),
+  setPending: (bool) => set(() => ({ pending: bool })),
 }));
 
 export default function Search() {
     const [q, setQ] = useState();
     const router = useRouter();
-    const setVideo = useStoreVideo((state) => state.setVideo);
+    const { setVideo, setPending } = useStoreVideo((state) => state);
 
     const fetchSearch = useCallback(async (query) => {
         const params = new URLSearchParams({
             q: query, limit: 20
         }).toString();
+        setPending(true);
         const data = await fetch(`/api/search?${params}`);
         const res = await data.json();
         setVideo(res);
+        setPending(false);
     }, [setVideo]);
     
     function handlerSubmit(e) {

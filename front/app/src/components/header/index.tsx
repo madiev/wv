@@ -10,7 +10,8 @@ export default function Header() {
                 <nav className="grid grid-cols-[1fr_2fr_1fr] gap-2 bg-purple-800 h-18">
                     <Link href="/" className="justify-self-center flex items-center space-x-3 rtl:space-x-reverse ml-4 mr-10">
                         <Image width={32} height={32} src="/video.svg" className="h-8" alt="Logo" />
-                        <span className="rainbow-animated self-center text-2xl font-semibold whitespace-nowrap dark:text-white">WatchVideo</span>
+                        <span className="md:hidden rainbow-animated self-center text-2xl font-semibold whitespace-nowrap dark:text-white">WV</span>
+                        <span className="hidden md:block rainbow-animated self-center text-2xl font-semibold whitespace-nowrap dark:text-white">WatchVideo</span>
                     </Link>
                     <div className="self-center">
                         <Search />
