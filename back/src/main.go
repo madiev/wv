@@ -7,12 +7,13 @@ import (
   "bytes"
   "regexp"
   "os/exec"
+  "context"
   "net/http"
   "io/ioutil"
   "path/filepath"
 
-  "google.golang.org/api/googleapi/transport"
   "google.golang.org/api/youtube/v3"
+  "google.golang.org/api/option"
 
   "github.com/gin-gonic/gin"
 )
@@ -24,6 +25,7 @@ type videoInfo struct {
     Thumbnail    string `json:"thumbnail"`
     ChannelId    string `json:"channel_id"`
     ChannelTitle string `json:"channel_title"`
+    Duration     string `json:"duration"`
     PublishedAt  string `json:"published_at"`
 }
 
@@ -151,11 +153,8 @@ func handlerSearch(c *gin.Context) {
     return
   }
 
-  client := &http.Client{
-    Transport: &transport.APIKey{Key: developerKey},
-  }
-
-  service, err := youtube.New(client)
+  ctx := context.Background()
+  service, err := youtube.NewService(ctx, option.WithAPIKey(developerKey))
   if err != nil {
     _ = c.AbortWithError(http.StatusInternalServerError, err)
   }
@@ -182,12 +181,21 @@ func handlerSearch(c *gin.Context) {
       //fmt.Printf("%#v\n", item.Snippet)
       var info videoInfo
 
+      call := service.Videos.List([]string{"contentDetails"}).Id(item.Id.VideoId)
+      response, err := call.Do()
+      if err != nil {
+        _ = c.AbortWithError(http.StatusInternalServerError, err)
+      }
+      duration := response.Items[0].ContentDetails.Duration
+
+
       info.ID = item.Id.VideoId
       info.Title = item.Snippet.Title
       info.Description = item.Snippet.Description
       info.Thumbnail = item.Snippet.Thumbnails.High.Url
       info.ChannelId = item.Snippet.ChannelId
       info.ChannelTitle = item.Snippet.ChannelTitle
+      info.Duration = duration
       info.PublishedAt = item.Snippet.PublishedAt
 
       video = append(video, info)

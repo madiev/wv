@@ -41,7 +41,7 @@ export default function VideoComponent() {
                                 src={el.thumbnail}
                                 alt={el.title}
                                 onClick={() => handlerClick(el)}
-                                className="cursor-pointer border border-gray-700 border-1 rounded-3xl w-full"
+                                className="cursor-pointer border border-gray-700 border-1 rounded-3xl w-full max-w-lg"
                             />
                         </div>
                         <div className="max-w-[500px] pt-5 pb-5">
