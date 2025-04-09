@@ -1,13 +1,14 @@
 #!/bin/bash
 
-# Проверяем наличие аргументов
-if [[ $# -eq 0 ]]; then
-  echo "Не указаны аргументы. Используйте: $0 \"аргументы\""
+if [[ $# -lt 2 ]]; then
+  echo "Не указаны необходимые аргументы. Используйте: $0 \"путь_до_папки_download\" \"аргументы_docker_run\""
   exit 1
 fi
 
-# Выполняем команду docker run с переданными аргументами
+mount_path=$1
+shift
+
 docker run --rm \
-  -v "/wv/back/download:/app" \
+  -v "$mount_path:/app" \
   -w /app \
   thr3a/yt-dlp "$@"

@@ -78,8 +78,9 @@ func handlerDownloadTask(c *gin.Context) {
     return
   }
 
+  dir := os.Getenv("DIR_DOWNLOAD")
   find := fmt.Sprintf("https://www.youtube.com/watch?v=%s", req.ID)
-  cmd := exec.Command("/bin/sh", "../download/download.sh", find)
+  cmd := exec.Command("/bin/sh", "../download/download.sh", dir, find)
 
   var stdout, stderr bytes.Buffer
   cmd.Stdout = &stdout
