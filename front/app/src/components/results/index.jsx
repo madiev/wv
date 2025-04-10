@@ -20,6 +20,29 @@ function Loading() {
   );
 }
 
+function convertToTime(duration) {
+    const result = [];
+    let hours = duration.match(/(\d+)H/);
+    let minutes = duration.match(/(\d+)M/);
+    let seconds = duration.match(/(\d+)S/);
+    if (hours) result.push(hours[1]);
+    if (minutes) {
+        minutes = minutes[1];
+        if (hours && minutes.length === 1) {
+            minutes = '0' + minutes;
+        }
+        result.push(minutes);
+    };
+    if (seconds) {
+        seconds = seconds[1];
+        if (minutes && seconds.length === 1) {
+            seconds = '0' + seconds;
+        }
+        result.push(seconds);
+    }
+    return result.join(':');
+}
+
 export default function VideoComponent() {
     const { data: { video }, pending } = useStoreVideo((state) => state);
     const router = useRouter();
@@ -35,14 +58,17 @@ export default function VideoComponent() {
                 <div key={i}>
                     <div className="grid grid-cols-2 break-words">
                         <div className="pt-5 pb-5 pr-5 flex justify-center">
-                            <Image
-                                width={380}
-                                height={360}
-                                src={el.thumbnail}
-                                alt={el.title}
-                                onClick={() => handlerClick(el)}
-                                className="cursor-pointer border border-gray-700 border-1 rounded-3xl w-full max-w-lg"
-                            />
+                            <div className="relative text-white">
+                                <Image
+                                    width={380}
+                                    height={360}
+                                    src={el.thumbnail}
+                                    alt={el.title}
+                                    onClick={() => handlerClick(el)}
+                                    className="cursor-pointer border border-gray-700 border-1 rounded-3xl w-full max-w-lg"
+                                />
+                                <div className="bg-black absolute bottom-[10px] right-[15px]">{convertToTime(el.duration)}</div>
+                            </div>
                         </div>
                         <div className="max-w-[500px] pt-5 pb-5">
                             <div className="text-white mb-2 text-xl font-semibold"  dangerouslySetInnerHTML={{ __html: el.title }}></div>
