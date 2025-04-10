@@ -58,7 +58,7 @@ export default function VideoComponent() {
                 <div key={i}>
                     <div className="grid grid-cols-2 break-words">
                         <div className="pt-5 pb-5 pr-5 flex justify-center">
-                            <div className="relative text-white">
+                            <div className="relative text-white h-fit">
                                 <Image
                                     width={380}
                                     height={360}
