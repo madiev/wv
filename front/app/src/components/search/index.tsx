@@ -1,33 +1,57 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { create } from 'zustand';
 import { useRouter } from 'next/navigation';
 
-export const useStoreVideo = create((set) => ({
-  data: {},
+type VideoStoreState = {
+    data: {
+        video: ElementsVideo[];
+    };
+    pending: boolean;
+}
+
+export type ElementsVideo = {
+    id: string;
+    thumbnail: string;
+    title: string;
+    description: string;
+    duration: string;
+}
+
+type VideoStoreActions = {
+  setVideo: ( res: VideoStoreState['data'] ) => void;
+  setPending: ( bool: VideoStoreState['pending'] ) => void;
+}
+
+type VideoStore = VideoStoreState & VideoStoreActions;
+
+export const useStoreVideo = create<VideoStore>((set) => ({
+  data: {
+    video: [],
+  },
   pending: true,
   setVideo: (res) => set(() => ({ data: res })),
   setPending: (bool) => set(() => ({ pending: bool })),
 }));
 
 export default function Search() {
-    const [q, setQ] = useState();
+    const [q, setQ] = useState('');
     const router = useRouter();
     const { setVideo, setPending } = useStoreVideo((state) => state);
-
-    const fetchSearch = useCallback(async (query) => {
+  
+    const fetchSearch = useCallback(async (query: string) => {
         const params = new URLSearchParams({
-            q: query, limit: 20
+            q: query, limit: '20'
         }).toString();
         setPending(true);
         const data = await fetch(`/api/search?${params}`);
         const res = await data.json();
         setVideo(res);
         setPending(false);
-    }, [setVideo]);
+    }, [setVideo, setPending]);
     
-    function handlerSubmit(e) {
+    function handlerSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         fetchSearch(q);
         router.push('/');
@@ -35,7 +59,7 @@ export default function Search() {
 
     useEffect(() => {
         fetchSearch('Музыка');
-    }, [fetchSearch])
+    }, [fetchSearch]);
 
     return (
         <form className="max-w-2xl mx-auto w-full pr-3" onSubmit={handlerSubmit} >

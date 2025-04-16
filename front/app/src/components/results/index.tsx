@@ -1,6 +1,6 @@
 'use client';
 
-import { useStoreVideo } from '@/components/search';
+import { useStoreVideo, ElementsVideo } from '@/components/search';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
@@ -20,25 +20,25 @@ function Loading() {
   );
 }
 
-function convertToTime(duration) {
+function convertToTime(duration: string ): string {
     const result = [];
-    let hours = duration.match(/(\d+)H/);
-    let minutes = duration.match(/(\d+)M/);
-    let seconds = duration.match(/(\d+)S/);
+    const hours = duration.match(/(\d+)H/);
+    const minutes = duration.match(/(\d+)M/);
+    const seconds = duration.match(/(\d+)S/);
     if (hours) result.push(hours[1]);
     if (minutes) {
-        minutes = minutes[1];
-        if (hours && minutes.length === 1) {
-            minutes = '0' + minutes;
+        let min = minutes[1];
+        if (hours && min.length === 1) {
+            min = '0' + min;
         }
-        result.push(minutes);
+        result.push(min);
     };
     if (seconds) {
-        seconds = seconds[1];
-        if (minutes && seconds.length === 1) {
-            seconds = '0' + seconds;
+        let sec = seconds[1];
+        if (minutes && sec.length === 1) {
+            sec = '0' + sec;
         }
-        result.push(seconds);
+        result.push(sec);
     }
     return result.join(':');
 }
@@ -47,14 +47,14 @@ export default function VideoComponent() {
     const { data: { video }, pending } = useStoreVideo((state) => state);
     const router = useRouter();
 
-    const handlerClick = (el) => {
+    const handlerClick = (el: ElementsVideo) => {
         router.push(`/watch?v=${el.id}`);
     }
 
     return (
         <div className="grid justify-center h-full" >
             {pending && <Loading />}
-            {!pending && Array.isArray(video) && video.length > 0 && video.map((el, i) => (
+            {!pending && Array.isArray(video) && video.length > 0 && video.map((el , i) => (
                 <div key={i}>
                     <div className="grid grid-cols-2 break-words">
                         <div className="pt-5 pb-5 pr-5 flex justify-center">
