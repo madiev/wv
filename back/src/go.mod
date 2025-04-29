@@ -1,9 +1,10 @@
-module my_tube
+module wv
 
 go 1.23.4
 
 require (
 	github.com/gin-gonic/gin v1.10.0
+	github.com/gorilla/websocket v1.5.3
 	google.golang.org/api v0.228.0
 )
 
