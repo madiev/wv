@@ -26,7 +26,7 @@ function Loading() {
             <span className="sr-only">Загрузка...</span>
             <div className="pt-5 text-purple-400 text-xl">Загружаю видео, подожди немного...</div>
             {listMsg.length > 0 && (
-              <div className="text-start text-white overflow-auto text-white justify-self-center w-auto mt-5 h-60 p-5 bg-black border border-gray-200 shadow-sm">
+              <div className="text-start text-white overflow-auto text-white justify-self-center w-auto max-w-lg mt-5 h-60 p-5 bg-black border border-gray-200 shadow-sm">
                   <h5 className="mb-2 text-lg font-bold tracking-tight text-orange-400">Детализация загрузки:</h5>
                   {listMsg.map((msg, i) => (
                     <p key={i} >{msg}</p>
