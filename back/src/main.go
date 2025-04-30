@@ -169,8 +169,8 @@ func handlerWatchVideo(c *gin.Context) {
 		return
 	}
 
-	c.Header("Ассept-Ranges", "bytes")
-	c.Header("Content-Length", strconv.Itoa(len(data)))
+	c.Request.Header.Add("Ассept-Ranges", "bytes")
+	c.Request.Header.Add("Content-Length", strconv.Itoa(len(data)))
 	c.Data(http.StatusOK, "video/mp4", data)
 }
 
