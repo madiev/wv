@@ -168,6 +168,7 @@ func handlerWatchVideo(c *gin.Context) {
 		return
 	}
 
+	c.Header("Ассept-Ranges", "bytes")
 	c.Data(http.StatusOK, "video/mp4", data)
 }
 
