@@ -29,20 +29,4 @@ func (cl *Client) HandlerWebsocket(c *gin.Context) {
 	}
 
 	cl.Conn = conn
-
-	// for {
-	// 	messageType, p, err := conn.ReadMessage()
-	// 	if err != nil {
-	// 		log.Printf("%s, error while reading message\n", err.Error())
-	// 		c.AbortWithError(http.StatusInternalServerError, err)
-	// 		break
-	// 	}
-
-	// 	err = conn.WriteMessage(messageType, append([]byte("server echo: "), p...))
-	// 	if err != nil {
-	// 		log.Printf("%s, error while writing message\n", err.Error())
-	// 		c.AbortWithError(http.StatusInternalServerError, err)
-	// 		break
-	// 	}
-	// }
 }

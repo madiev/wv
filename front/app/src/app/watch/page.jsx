@@ -50,7 +50,11 @@ function WatchComponent() {
           const task = await fetch(`/api/task?v=${id}`);
           const data = await task.json();
           if (data?.status === "ok" ) {
-            const video = await fetch(`/api/video?v=${id}`);
+            const video = await fetch(`/api/video?v=${id}`, {
+              headers: {
+                Range: '1000-2000'
+              }
+            });
             const blob = await video.blob();
             const videoUrl = URL.createObjectURL(blob);
             setShow(false);

@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -169,6 +170,7 @@ func handlerWatchVideo(c *gin.Context) {
 	}
 
 	c.Header("Ассept-Ranges", "bytes")
+	c.Header("Content-Length", strconv.Itoa(len(data)))
 	c.Data(http.StatusOK, "video/mp4", data)
 }
 
