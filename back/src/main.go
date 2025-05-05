@@ -4,14 +4,12 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -156,12 +154,19 @@ func handlerWatchVideo(c *gin.Context) {
 		return
 	}
 
-	data, err := ioutil.ReadFile(filePath)
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		log.Printf("Файл не найден: %v\n", err)
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	f, err := os.Open(filePath)
 	if err != nil {
 		log.Printf("Ошибка открытия файла: %v\n", err)
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	defer f.Close()
 
 	err = os.Remove(filePath)
 	if err != nil {
@@ -169,9 +174,10 @@ func handlerWatchVideo(c *gin.Context) {
 		return
 	}
 
-	c.Request.Header.Add("Ассept-Ranges", "bytes")
-	c.Request.Header.Add("Content-Length", strconv.Itoa(len(data)))
-	c.Data(http.StatusOK, "video/mp4", data)
+	//c.Request.Header.Add("Ассept-Ranges", "bytes")
+	//c.Request.Header.Add("Content-Length", strconv.Itoa(len(data)))
+	//c.Data(http.StatusOK, "video/mp4", data)
+	http.ServeContent(c.Writer, c.Request, fileInfo.Name(), fileInfo.ModTime(), f)
 }
 
 func handlerSearch(c *gin.Context) {
