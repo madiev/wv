@@ -4,15 +4,12 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strconv"
-	"strings"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -183,49 +180,16 @@ func handlerWatchVideo(c *gin.Context) {
 	//c.Request.Header.Add("Content-Type", "video/mp4")
 	//c.Request.Header.Add("Content-Length", strconv.Itoa(len(data)))
 	//c.Data(http.StatusOK, "video/mp4", data)
-	rangeHeader := c.Request.Header.Get("Range")
-	var start, end int64 = 0, size - 1
-
-	if len(rangeHeader) > 0 {
-		startStr := rangeHeader[len("bytes="):]
-		endStr := ""
-		i := strings.Index(startStr, "-")
-		if i >= 0 {
-			startStr = startStr[:i]
-			endStr = startStr[i+1:]
-		}
-
-		startInt, _ := strconv.ParseInt(startStr, 10, 64)
-		if len(endStr) > 0 && endStr != "" {
-			endInt, _ := strconv.ParseInt(endStr, 10, 64)
-			end = min(endInt, size-1)
-		} else {
-			end = size - 1
-		}
-
-		if startInt > end || startInt < 0 || end >= size {
-			c.AbortWithStatusJSON(http.StatusRequestedRangeNotSatisfiable, gin.H{"error": "Invalid Range"})
-			return
-		}
-
-		start = startInt
-		end = max(min(end, size-1), start)
-
-		contentLength := end - start + 1
-		extraHeaders := map[string]string{
-			"Accept-Ranges": "bytes",
-			"Content-Range": fmt.Sprintf("bytes %d-%d/%d", start, end, size),
-		}
-		c.DataFromReader(
-			http.StatusPartialContent,
-			contentLength,
-			http.DetectContentType([]byte{}),
-			io.NewSectionReader(f, start, contentLength),
-			extraHeaders,
-		)
-	} else {
-		http.ServeContent(c.Writer, c.Request, "", fileInfo.ModTime(), f)
+	extraHeaders := map[string]string{
+		"Accept-Ranges": "bytes",
 	}
+	c.DataFromReader(
+		http.StatusOK,
+		size,
+		"video/mp4",
+		f,
+		extraHeaders,
+	)
 }
 
 func handlerSearch(c *gin.Context) {
