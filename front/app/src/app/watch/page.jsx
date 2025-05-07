@@ -52,7 +52,7 @@ function WatchComponent() {
           if (data?.status === "ok" ) {
             const video = await fetch(`/api/video?v=${id}`, {
               headers: {
-                Range: '1000-2000'
+                Range: 'bytes=0-1023'
               }
             });
             const blob = await video.blob();

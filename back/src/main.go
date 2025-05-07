@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -180,16 +182,36 @@ func handlerWatchVideo(c *gin.Context) {
 	//c.Request.Header.Add("Content-Type", "video/mp4")
 	//c.Request.Header.Add("Content-Length", strconv.Itoa(len(data)))
 	//c.Data(http.StatusOK, "video/mp4", data)
-	extraHeaders := map[string]string{
-		"Accept-Ranges": "bytes",
+
+	rangeHeader := c.Request.Header.Get("Range")
+	if len(rangeHeader) > 0 {
+		var start, end string
+
+		rangeBytes := rangeHeader[len("bytes="):]
+		i := strings.Index(rangeBytes, "-")
+		start = rangeBytes[:i]
+		end = rangeBytes[i+1:]
+
+		extraHeaders := map[string]string{
+			"Accept-Ranges": "bytes",
+			"Content-Range": fmt.Sprintf("bytes %s-%s/%d", start, end, size),
+		}
+		c.DataFromReader(
+			http.StatusPartialContent,
+			size,
+			"video/mp4",
+			f,
+			extraHeaders,
+		)
+	} else {
+		bs := make([]byte, size)
+		_, err = bufio.NewReader(f).Read(bs)
+		if err != nil && err != io.EOF {
+			_ = c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+		c.Data(http.StatusOK, "video/mp4", bs)
 	}
-	c.DataFromReader(
-		http.StatusOK,
-		size,
-		"video/mp4",
-		f,
-		extraHeaders,
-	)
 }
 
 func handlerSearch(c *gin.Context) {
