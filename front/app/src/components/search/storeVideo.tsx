@@ -17,8 +17,6 @@ export type ElementsVideo = {
 }
 
 type VideoStoreActions = {
-  //setVideo: ( res: VideoStoreState['data'] ) => void;
-  //setPending: ( bool: VideoStoreState['pending'] ) => void;
   fetchSearch: (query: string) => void;
 }
 
@@ -40,7 +38,9 @@ export const useStoreVideo = create<VideoStore>((set) => ({
         const res = await data.json();    
         set({data: res, error: null});
     } catch (error) {
-       set({error: error.message}); 
+        if (error instanceof Error) {
+            set({error}); 
+        }
     } finally {
         set({pending: false});
     }
