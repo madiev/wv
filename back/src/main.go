@@ -185,7 +185,7 @@ func handlerWatchVideo(c *gin.Context) {
 	if len(rangeHeader) > 0 {
 		fmt.Sscanf(rangeHeader, "bytes=%d-%d", &start, &length)
 		length = size - 1
-		c.Request.Header.Add("Content-Range", fmt.Sprintf("bytes %d-%d/%d", start, length, size))
+		c.Writer.Header().Add("Content-Range", fmt.Sprintf("bytes %d-%d/%d", start, length, size))
 		status = http.StatusPartialContent
 	} else {
 		start = 0
@@ -201,8 +201,9 @@ func handlerWatchVideo(c *gin.Context) {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.Request.Header.Add("Ассept-Ranges", "bytes")
-	c.Data(status, "video/mp4", buffer[:n])
+	c.Writer.Header().Set("Content-Type", "video/mp4")
+	c.Writer.Header().Set("Ассept-Ranges", "bytes")
+	c.Writer.Write(buffer[:n])
 }
 
 func handlerSearch(c *gin.Context) {
