@@ -155,14 +155,6 @@ func handlerWatchVideo(c *gin.Context) {
 		return
 	}
 
-	fileInfo, err := os.Stat(filePath)
-	if err != nil {
-		log.Printf("Файл не найден: %v\n", err)
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	size := fileInfo.Size()
-
 	f, err := os.Open(filePath)
 	if err != nil {
 		log.Printf("Ошибка открытия файла: %v\n", err)
@@ -171,11 +163,14 @@ func handlerWatchVideo(c *gin.Context) {
 	}
 	defer f.Close()
 
-	err = os.Remove(filePath)
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
+	fileInfo, _ := f.Stat()
+	size := fileInfo.Size()
+
+	// err = os.Remove(filePath)
+	// if err != nil {
+	// 	_ = c.AbortWithError(http.StatusInternalServerError, err)
+	// 	return
+	// }
 
 	//c.Request.Header.Add("Ассept-Ranges", "bytes")
 	//c.Request.Header.Add("Content-Type", "video/mp4")
