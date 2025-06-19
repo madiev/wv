@@ -135,6 +135,32 @@ func handlerDownloadTask(c *gin.Context, ws *ws.Client) {
 	c.JSON(http.StatusOK, response)
 }
 
+func handlerDeleteVideo(c *gin.Context) {
+	id := c.Param("id")
+
+	directory := "../download"
+	regexPattern := `^.+\[` + id + `\]\..+$`
+
+	filePath := findFileWithRegex(directory, regexPattern)
+	if filePath == "" {
+		log.Println("Файл не найден")
+		c.Abort()
+		return
+	}
+
+	err := os.Remove(filePath)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	response := map[string]string{
+		"status": "ok",
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 func handlerWatchVideo(c *gin.Context) {
 	var req struct {
 		ID string `form:"v" binding:"required"`
@@ -151,7 +177,7 @@ func handlerWatchVideo(c *gin.Context) {
 	filePath := findFileWithRegex(directory, regexPattern)
 	if filePath == "" {
 		log.Println("Файл не найден")
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		c.Abort()
 		return
 	}
 
@@ -290,6 +316,7 @@ func main() {
 		handlerDownloadTask(c, &client)
 	})
 	api.GET("/video", handlerWatchVideo)
+	api.DELETE("/video/:id", handlerDeleteVideo)
 	api.GET("/ws", client.HandlerWebsocket)
 
 	router.Run(":9999")

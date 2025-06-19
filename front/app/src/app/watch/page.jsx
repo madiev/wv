@@ -50,18 +50,16 @@ function WatchComponent() {
           const task = await fetch(`/api/task?v=${id}`);
           const data = await task.json();
           if (data?.status === "ok" ) {
-            const video = await fetch(`/api/video?v=${id}`, {
-              headers: {
-                Range: 'bytes=0-1023'
-              }
-            });
-            const blob = await video.blob();
-            const videoUrl = URL.createObjectURL(blob);
             setShow(false);
-            setUrl(videoUrl);
+            setUrl(`/api/video?v=${id}`);
           }
       };
       req();
+      return async () => {
+        const task = await fetch(`/api/video/${id}`, {
+          method: 'DELETE',
+        });
+      };
   }, [searchParams]);
   return (
       <div className="flex justify-center items-center h-full">
