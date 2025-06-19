@@ -11,7 +11,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
-	"strings"
 
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -184,34 +183,31 @@ func handlerWatchVideo(c *gin.Context) {
 	//c.Data(http.StatusOK, "video/mp4", data)
 
 	rangeHeader := c.Request.Header.Get("Range")
+	var start int64
+	var length int64
+	var status int
+
 	if len(rangeHeader) > 0 {
-		var start, end string
-
-		rangeBytes := rangeHeader[len("bytes="):]
-		i := strings.Index(rangeBytes, "-")
-		start = rangeBytes[:i]
-		end = rangeBytes[i+1:]
-
-		extraHeaders := map[string]string{
-			"Accept-Ranges": "bytes",
-			"Content-Range": fmt.Sprintf("bytes %s-%s/%d", start, end, size),
-		}
-		c.DataFromReader(
-			http.StatusPartialContent,
-			size,
-			"video/mp4",
-			f,
-			extraHeaders,
-		)
+		fmt.Sscanf(rangeHeader, "bytes=%d-%d", &start, &length)
+		length = size - 1
+		c.Request.Header.Add("Content-Range", fmt.Sprintf("bytes %d-%d/%d", start, length, size))
+		status = http.StatusPartialContent
 	} else {
-		bs := make([]byte, size)
-		_, err = bufio.NewReader(f).Read(bs)
-		if err != nil && err != io.EOF {
-			_ = c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-		c.Data(http.StatusOK, "video/mp4", bs)
+		start = 0
+		length = size - 1
+		status = http.StatusOK
 	}
+
+	bufSize := int(length - start + 1)
+	buffer := make([]byte, bufSize)
+
+	n, err := f.ReadAt(buffer, start)
+	if err != nil && err != io.EOF {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Request.Header.Add("Ассept-Ranges", "bytes")
+	c.Data(status, "video/mp4", buffer[:n])
 }
 
 func handlerSearch(c *gin.Context) {
