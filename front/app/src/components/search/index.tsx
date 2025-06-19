@@ -1,61 +1,19 @@
 'use client';
 
 import { useState, useEffect, useCallback, FormEvent } from 'react';
-import { create } from 'zustand';
+import { useStoreVideo } from './storeVideo';
 import { useRouter } from 'next/navigation';
-
-type VideoStoreState = {
-    data: {
-        video: ElementsVideo[];
-    };
-    pending: boolean;
-}
-
-export type ElementsVideo = {
-    id: string;
-    thumbnail: string;
-    title: string;
-    description: string;
-    duration: string;
-}
-
-type VideoStoreActions = {
-  setVideo: ( res: VideoStoreState['data'] ) => void;
-  setPending: ( bool: VideoStoreState['pending'] ) => void;
-}
-
-type VideoStore = VideoStoreState & VideoStoreActions;
-
-export const useStoreVideo = create<VideoStore>((set) => ({
-  data: {
-    video: [],
-  },
-  pending: true,
-  setVideo: (res) => set(() => ({ data: res })),
-  setPending: (bool) => set(() => ({ pending: bool })),
-}));
 
 export default function Search() {
     const [q, setQ] = useState('');
     const router = useRouter();
-    const { setVideo, setPending } = useStoreVideo((state) => state);
-  
-    const fetchSearch = useCallback(async (query: string) => {
-        const params = new URLSearchParams({
-            q: query, limit: '20'
-        }).toString();
-        setPending(true);
-        const data = await fetch(`/api/search?${params}`);
-        const res = await data.json();
-        setVideo(res);
-        setPending(false);
-    }, [setVideo, setPending]);
+    const fetchSearch = useStoreVideo((state) => state.fetchSearch);
     
-    function handlerSubmit(e: FormEvent<HTMLFormElement>) {
+    const handlerSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         fetchSearch(q);
         router.push('/');
-    }
+    }, []);
 
     useEffect(() => {
         fetchSearch('Музыка');

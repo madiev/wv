@@ -1,8 +1,10 @@
 'use client';
 
-import { useStoreVideo, ElementsVideo } from '@/components/search';
+import { useStoreVideo, ElementsVideo } from '@/components/search/storeVideo';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useCallback } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 function Loading() {
   return (
@@ -44,12 +46,16 @@ function convertToTime(duration: string ): string {
 }
 
 export default function VideoComponent() {
-    const { data: { video }, pending } = useStoreVideo((state) => state);
+    const [video, pending] = useStoreVideo(useShallow((state) => ([
+        state.data.video,
+        state.pending
+    ])));
+    
     const router = useRouter();
 
-    const handlerClick = (el: ElementsVideo) => {
+    const handlerClick = useCallback((el: ElementsVideo) => {
         router.push(`/watch?v=${el.id}`);
-    }
+    }, []);
 
     return (
         <div className="grid justify-center h-full" >
