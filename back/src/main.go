@@ -180,17 +180,16 @@ func handlerWatchVideo(c *gin.Context) {
 	rangeHeader := c.Request.Header.Get("Range")
 	var start int64
 	var length int64
-	var status int
 
 	if len(rangeHeader) > 0 {
 		fmt.Sscanf(rangeHeader, "bytes=%d-%d", &start, &length)
 		length = size - 1
 		c.Writer.Header().Add("Content-Range", fmt.Sprintf("bytes %d-%d/%d", start, length, size))
-		status = http.StatusPartialContent
+		c.Writer.WriteHeader(http.StatusPartialContent)
 	} else {
 		start = 0
 		length = size - 1
-		status = http.StatusOK
+		c.Writer.WriteHeader(http.StatusOK)
 	}
 
 	bufSize := int(length - start + 1)
