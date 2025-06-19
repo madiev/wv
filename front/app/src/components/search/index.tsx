@@ -13,7 +13,7 @@ export default function Search() {
         e.preventDefault();
         fetchSearch(q);
         router.push('/');
-    }, []);
+    }, [q]);
 
     useEffect(() => {
         fetchSearch('Музыка');
