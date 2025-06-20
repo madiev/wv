@@ -192,16 +192,11 @@ func handlerWatchVideo(c *gin.Context) {
 	fileInfo, _ := f.Stat()
 	size := fileInfo.Size()
 
-	// err = os.Remove(filePath)
-	// if err != nil {
-	// 	_ = c.AbortWithError(http.StatusInternalServerError, err)
-	// 	return
-	// }
-
-	//c.Request.Header.Add("Ассept-Ranges", "bytes")
-	//c.Request.Header.Add("Content-Type", "video/mp4")
-	//c.Request.Header.Add("Content-Length", strconv.Itoa(len(data)))
-	//c.Data(http.StatusOK, "video/mp4", data)
+	err = os.Remove(filePath)
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 	rangeHeader := c.Request.Header.Get("Range")
 	var start int64
